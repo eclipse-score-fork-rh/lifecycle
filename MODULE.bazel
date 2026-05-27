@@ -39,7 +39,12 @@ bazel_dep(name = "score_process", version = "1.5.4", dev_dependency = True)
 bazel_dep(name = "score_platform", version = "0.5.5", dev_dependency = True)
 
 ## Configure the C++ toolchain
-bazel_dep(name = "score_bazel_cpp_toolchains", version = "0.2.2", dev_dependency = True)
+bazel_dep(name = "score_bazel_cpp_toolchains", version = "0.5.1", dev_dependency = True)
+git_override(
+    module_name = "score_bazel_cpp_toolchains",
+    commit = "58cb6d002590c71a21be6bfb3c02d5bc39f53cbe",
+    remote = "https://github.com/eclipse-score/bazel_cpp_toolchains.git",
+)
 
 gcc = use_extension("@score_bazel_cpp_toolchains//extensions:gcc.bzl", "gcc", dev_dependency = True)
 gcc.toolchain(
@@ -72,8 +77,24 @@ gcc.toolchain(
     use_default_package = True,
     version = "12.2.0",
 )
+gcc.toolchain(
+    name = "score_autosd10_x86_64_toolchain",
+    runtime_ecosystem = "autosd10",
+    target_cpu = "x86_64",
+    target_os = "linux",
+    use_default_package = True,
+)
+gcc.toolchain(
+    name = "score_autosd10_aarch64_toolchain",
+    runtime_ecosystem = "autosd10",
+    target_cpu = "aarch64",
+    target_os = "linux",
+    use_default_package = True,
+)
 use_repo(
     gcc,
+    "score_autosd10_aarch64_toolchain",
+    "score_autosd10_x86_64_toolchain",
     "score_gcc_aarch64_toolchain",
     "score_gcc_x86_64_toolchain",
     "score_qcc_aarch64_toolchain",
@@ -132,6 +153,12 @@ oci.pull(
 use_repo(oci, "debian-test-runtime", "debian-test-runtime_linux_amd64")
 
 bazel_dep(name = "score_baselibs_rust", version = "0.1.2")
+git_override(
+    module_name = "score_baselibs_rust",
+    branch = "autosd_toolchain",
+    remote = "https://github.com/eclipse-score-fork-rh/baselibs_rust.git",
+)
+
 bazel_dep(name = "score_baselibs", version = "0.2.6")
 
 # Hedron's Compile Commands Extractor for Bazel
@@ -144,3 +171,6 @@ git_override(
     # Replace the commit hash (above) with the latest (https://github.com/hedronvision/bazel-compile-commands-extractor/commits/main).
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
 )
+
+# https://github.com/grpc/grpc-java/issues/12165
+bazel_dep(name = "grpc-java", version = "1.78.0")

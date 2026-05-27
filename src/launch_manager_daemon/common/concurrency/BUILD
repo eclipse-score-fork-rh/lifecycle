@@ -26,9 +26,12 @@ cc_library(
         "concurrency_error_domain.hpp",
         "mpmc_concurrent_queue.hpp",
     ],
-    linkopts = [
-        "-l:libatomic.a",
-    ],
+    linkopts = select({
+      "@platforms//os:qnx": [
+          "-l:libatomic.a",
+      ],
+      "//conditions:default": [],
+    }),
     strip_include_prefix = "//src/launch_manager_daemon/common",
     visibility = ["//src:__subpackages__"],
     deps = [
